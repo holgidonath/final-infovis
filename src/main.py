@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.responses import RedirectResponse
 from fastapi.params import Depends
 from database import models, schema
 from sqlalchemy.orm import Session
@@ -17,12 +18,12 @@ def get_db():
         db.close()
 
 @app.get("/")
-def read_something():
-  return {"msg":"Hello World"}
-
+def main():
+    return RedirectResponse(url="/docs/")
 
 
 @app.get("/datos/", response_model=List[schema.datos])
 def show_data(db:Session=Depends(get_db)):
     datos = db.query(models.data).all()
     return datos
+
