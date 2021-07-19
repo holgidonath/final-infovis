@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.expression import false
 
-SQLALCHEMY_DATABASES_URL = ""
+SQLALCHEMY_DATABASES_URL = "postgresql://postgres:password@localhost:5432/infovis"
 
 engine = create_engine(SQLALCHEMY_DATABASES_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=false, bind=engine)
