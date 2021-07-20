@@ -22,8 +22,8 @@ def main():
     return RedirectResponse(url="/docs/")
 
 
-@app.get("/datos/", response_model=List[schema.datos])
+@app.get("/datos/", response_model=List[schema.Datos])
 def show_data(db:Session=Depends(get_db)):
-    datos = db.query(models.data).all()
-    return datos
+    return db.query(models.Datos).all()
+
 

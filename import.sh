@@ -17,7 +17,7 @@ psql -U $1 -d $3 -h $4 -c "CREATE TABLE datos
     jurisdiccion_nombre text,
     vacuna_nombre text,
     primera_dosis_cantidad integer,
-    segundad_dosis_cantidad integer
+    segunda_dosis_cantidad integer
 );"
 
 echo "Populating table..."
