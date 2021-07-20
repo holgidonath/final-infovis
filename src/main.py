@@ -26,4 +26,6 @@ def main():
 def show_data(db:Session=Depends(get_db)):
     return db.query(models.Datos).all()
 
-
+@app.get("/datos/provincias/primerdosis")
+def read_vacunas(db: Session = Depends(get_db)):
+    return db.execute("select jurisdiccion_nombre primera_dosis_cantidad, count (primera_dosis_cantidad) from datos group by jurisdiccion_nombre").all()
