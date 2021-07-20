@@ -9,7 +9,15 @@ from typing import List
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
+tags_metadata = [
+    {"name": "Data general", "description": "Obtiene todos los datos."},
+    {"name": "Dosis por provincia",
+        "description": "Obtiene dosis aplicadas por provinicia."}, 
+    {"name": "Dosis por vacuna",
+        "description": "Obtiene dosis aplicadas por nombre de vacuna."},
+    {"name": "Dosis por provinicia y vacuna",
+        "description": "Obtiene dosis aplicadas por provinicia y nombre de vacuna."},  
+]
 def get_db():
     db = SessionLocal()
     try:
@@ -21,11 +29,44 @@ def get_db():
 def main():
     return RedirectResponse(url="/docs/")
 
+#ALL DATA
 
-@app.get("/datos/", response_model=List[schema.Datos])
-def show_data(db:Session=Depends(get_db)):
+@app.get("/datos/", response_model=List[schema.Datos],tags=["Data general"])
+def show_data_full(db:Session=Depends(get_db)):
     return db.query(models.Datos).all()
 
-@app.get("/datos/provincias/primerdosis")
-def read_vacunas(db: Session = Depends(get_db)):
-    return db.execute("select jurisdiccion_nombre primera_dosis_cantidad, count (primera_dosis_cantidad) from datos group by jurisdiccion_nombre").all()
+#DATA BY PROVINCE
+
+
+@app.get("/datos/provincias/primerdosis",tags=["Dosis por provincia"])
+def show_provinces_first_doses(db: Session = Depends(get_db)):
+    return db.execute("select jurisdiccion_nombre, SUM(primera_dosis_cantidad) as primer_dosis_cantidad from datos GROUP BY jurisdiccion_nombre ORDER BY primer_dosis_cantidad DESC").all()
+
+@app.get("/datos/provincias/segundadosis",tags=["Dosis por provincia"])
+def show_provinces_second_doses(db: Session = Depends(get_db)):
+    return db.execute("select jurisdiccion_nombre, SUM(segunda_dosis_cantidad) as segunda_dosis_cantidad from datos GROUP BY jurisdiccion_nombre ORDER BY segunda_dosis_cantidad DESC").all()
+
+@app.get("/datos/provincias/alldosis",tags=["Dosis por provincia"])
+def show_provinces_all_doses(db: Session = Depends(get_db)):
+    return db.execute("select jurisdiccion_nombre, sum(primera_dosis_cantidad + segunda_dosis_cantidad) as todas_las_dosis from datos GROUP BY jurisdiccion_nombre ORDER BY todas_las_dosis DESC").all()
+
+
+#DATA BY VACCINE NAME
+
+@app.get("/datos/vacunanombre/primeradosis",tags=["Dosis por vacuna"])
+def show_vaccine_name_first_doses(db: Session = Depends(get_db)):
+    return db.execute("select vacuna_nombre, sum(primera_dosis_cantidad) as primera_dosis_cantidad from datos GROUP BY vacuna_nombre ORDER BY primera_dosis_cantidad DESC").all()  
+
+@app.get("/datos/vacunanombre/segundadosis",tags=["Dosis por vacuna"])
+def show_vaccine_name_second_doses(db: Session = Depends(get_db)):
+    return db.execute("select vacuna_nombre, sum(segunda_dosis_cantidad) as segunda_dosis_cantidad from datos GROUP BY vacuna_nombre ORDER BY segunda_dosis_cantidad DESC").all()  
+
+@app.get("/datos/vacunanombre/alldosis",tags=["Dosis por vacuna"])
+def show_vaccine_name_all_doses(db: Session = Depends(get_db)):
+    return db.execute("select vacuna_nombre, sum(primera_dosis_cantidad + segunda_dosis_cantidad) as total_dosis from datos GROUP BY vacuna_nombre ORDER BY total_dosis DESC").all()  
+
+#DATA BY PROVINCE AND VACCINE NAME
+
+@app.get("/datos/provincias/vacunanombre/alldosis",tags=["Dosis por provinicia y vacuna"])
+def show_provinces_and_vaccine_name_all_doses(db: Session = Depends(get_db)):
+    return db.execute("select jurisdiccion_nombre, vacuna_nombre, sum(primera_dosis_cantidad + segunda_dosis_cantidad) as total_dosis from datos GROUP BY jurisdiccion_nombre, vacuna_nombre ORDER BY jurisdiccion_nombre").all()  
