@@ -6,18 +6,16 @@ from sqlalchemy.orm import Session
 from database.db import SessionLocal, engine
 from typing import List
 
+tags_metadata = [
+    {"name": "Data general"},
+    {"name": "Dosis por provincia"}, 
+    {"name": "Dosis por vacuna"},
+    {"name": "Dosis por provinicia y vacuna"},  
+]
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-tags_metadata = [
-    {"name": "Data general", "description": "Obtiene todos los datos."},
-    {"name": "Dosis por provincia",
-        "description": "Obtiene dosis aplicadas por provinicia."}, 
-    {"name": "Dosis por vacuna",
-        "description": "Obtiene dosis aplicadas por nombre de vacuna."},
-    {"name": "Dosis por provinicia y vacuna",
-        "description": "Obtiene dosis aplicadas por provinicia y nombre de vacuna."},  
-]
+app = FastAPI(title="Final Infovis API", description="API para obtener información a cerca de vacunación en Argentina.")
+
 def get_db():
     db = SessionLocal()
     try:
