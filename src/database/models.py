@@ -16,7 +16,6 @@ class Datos(Base):
     segunda_dosis_cantidad = Column(Integer)
   
 
-  
 
 
 
